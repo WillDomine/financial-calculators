@@ -90,7 +90,7 @@
   <section class="mt-24 text-center">
     <p class="text-sm text-slate-400 font-medium">
       Free to use • No account required • Privacy focused • 
-      <span><a href="https://buymeacoffee.com/willdomine5" class="hover:text-blue-600 underline">Buy me a coffee</a></span>
+      <span><a href="https://buymeacoffee.com/willdomine5" target="_blank" class="hover:text-blue-600 underline">Buy me a coffee</a></span>
     </p>
   </section>
 </main>
