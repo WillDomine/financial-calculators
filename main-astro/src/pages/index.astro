@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { PieChart, Home, Building2, Car, ArrowRight } from '@lucide/astro';
+
+const calculators = [
+  {
+    title: "Budget Planner",
+    description: "Track your monthly income and expenses to reach your savings goals.",
+    href: "/budget",
+    icon: PieChart,
+    color: "bg-blue-500",
+  },
+  {
+    title: "Mortgage Calc",
+    description: "Estimate your monthly payments and see how much home you can afford.",
+    href: "/mortgage",
+    icon: Home,
+    color: "bg-emerald-500",
+  },
+  {
+    title: "Apartment Finder",
+    description: "Calculate rent-to-income ratios and move-in costs.",
+    href: "/apartment",
+    icon: Building2,
+    color: "bg-purple-500",
+  },
+  {
+    title: "Car Loan",
+    description: "Analyze interest rates and terms to find your ideal monthly car payment.",
+    href: "/car",
+    icon: Car,
+    color: "bg-orange-500",
+  }
+];
+---
+
+<Layout title="Home">
+  <main class="min-h-screen bg-slate-50 pb-32">
+    <section class="max-w-4xl mx-auto px-6 pb-10 text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider mb-6 border border-blue-100">
+        ✨ Financial Planning Made Simple
+      </div>
+      <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
+        Take control of your <span class="text-blue-600">financial future.</span>
+      </h1>
+    </section>
+
+    <section class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {calculators.map((calc) => (
+          <a href={calc.href} class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-1">
+            <div class="flex items-start justify-between">
+              <div class={`p-3 rounded-2xl ${calc.color} text-white shadow-lg`}>
+                <calc.icon size={28} />
+              </div>
+              <div class="text-slate-300 group-hover:text-blue-600 transition-colors">
+                <ArrowRight size={24} />
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h2 class="text-2xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                {calc.title}
+              </h2>
+              <p class="mt-2 text-slate-500 leading-relaxed">
+                {calc.description}
+              </p>
+            </div>
+
+            <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+               <calc.icon size={120} />
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-24 text-center">
+      <p class="text-sm text-slate-400 font-medium">Free to use • No account required • Privacy focused</p>
+    </section>
+  </main>
+</Layout>

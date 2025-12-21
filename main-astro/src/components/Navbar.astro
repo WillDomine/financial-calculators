@@ -1,0 +1,44 @@
+---
+import { Home, PieChart, Car, Building2 } from '@lucide/astro';
+
+const navItems = [
+    { name: "Home", href: "/", icon: Home },
+    { name: "Budget", href: "/budget", icon: PieChart },
+    { name: "Mortgage", href: "/mortgage", icon: Home },
+    { name: "Apartment", href: "/apartment", icon: Building2 },
+    { name: "Car", href: "/car", icon: Car }
+];
+
+const pathName = Astro.url.pathname;
+---
+
+<nav class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 md:top-6 md:bottom-auto">
+  <div class="flex items-center gap-1 p-2 bg-white/80 backdrop-blur-lg border border-slate-200 rounded-2xl shadow-xl">
+    {
+      navItems.map((item) => {
+        const Icon = item.icon;
+        const active = pathName == item.href;
+        
+        return (
+          <a
+            href={item.href}
+            class:list={[
+              "flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-300 group",
+              active 
+                ? "bg-blue-600 text-white shadow-md shadow-blue-200" 
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            ]}
+          >
+            <Icon class:list={["w-5 h-5 transition-transform group-hover:scale-110", active ? "text-white" : "text-slate-500"]} />
+            <span class:list={[
+              "text-sm font-semibold whitespace-nowrap",
+              active ? "block" : "hidden lg:block" 
+            ]}>
+              {item.name}
+            </span>
+          </a>
+        )
+      })
+    }
+  </div>
+</nav>
