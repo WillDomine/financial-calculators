@@ -19,3 +19,13 @@ const { title } = Astro.props;
 		<slot />
 	</body>
 </html>
+
+<script>
+	import {init_data} from '../utils/financial-data'
+
+	//Loads all of the past user data
+	init_data()
+	
+	//Updates every page transition
+	document.addEventListener('astro:page-load', init_data);
+</script>

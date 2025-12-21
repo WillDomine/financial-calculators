@@ -1,7 +1,177 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import { Plus, Zap, Heart, TrendingUp, Landmark } from "@lucide/astro";
 ---
 
-<Layout title="Budget Planner">
+<Layout title="Budget Planner" themeColor="bg-blue-50">
+    <main class="md:ml-24 p-4 lg:p-8 max-w-[1600px] mx-auto pb-32 md:pb-8">
+        
+        <section class="bg-white/80 backdrop-blur-md rounded-[2rem] p-5 mb-6 border border-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200">
+                    <Landmark size={20} />
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-slate-900 tracking-tight">Budget Hub</h1>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Live Sync</p>
+                </div>
+            </div>
 
+            <div class="flex flex-row items-center gap-3 w-full sm:w-auto">
+                <div class="bg-white border border-slate-100 p-2.5 rounded-xl shadow-sm flex-1 sm:min-w-[150px]">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-0.5">Net Monthly Income</label>
+                    <div class="flex font-bold">
+                        <span class="text-slate-400 pr-0.5">$</span>
+                        <input
+                            type="number"
+                            id="strategy-income"
+                            placeholder="0"
+                            class="bg-transparent font-bold outline-none w-full text-slate-900"
+                        />
+                    </div>
+                </div>
+                <div class="bg-white border border-slate-100 p-2.5 rounded-xl shadow-sm flex-1 sm:min-w-[150px]">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase mb-0.5">Budget Strategy</label>
+                    <select
+                        id="strategy-select"
+                        class="bg-transparent font-bold outline-none w-full text-slate-700 text-sm cursor-pointer"
+                    >
+                        <option value="503020">50/30/20 (Standard)</option>
+                        <option value="702010">70/20/10 (Aggressive)</option>
+                        <option value="602020">60/20/20 (Balanced)</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+            <div class="flex flex-col gap-4">
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="absolute -top-2 -right-2 p-6 opacity-5 text-blue-600"><Zap size={80} /></div>
+                    <h2 class="text-xl font-black text-slate-900 mb-1">Needs</h2>
+                    <p id="needs-percent" class="text-[10px] font-bold text-blue-600 uppercase mb-3">50% Allocation</p>
+                    <div class="flex justify-between text-xs font-bold mb-1.5">
+                        <span class="text-slate-400">Monthly Limit</span>
+                        <span class="text-blue-600" id="needs-rem">$0</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div id="needs-bar" class="bg-blue-600 h-full transition-all duration-700" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="space-y-3" id="list-needs">
+                    <button class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-blue-400 hover:text-blue-600 transition-all bg-white/50">
+                        <Plus size={14} class="inline mr-1" /> Add Need
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="absolute -top-2 -right-2 p-6 opacity-5 text-purple-600"><Heart size={80} /></div>
+                    <h2 class="text-xl font-black text-slate-900 mb-1">Wants</h2>
+                    <p id="wants-percent" class="text-[10px] font-bold text-purple-600 uppercase mb-3">30% Allocation</p>
+                    <div class="flex justify-between text-xs font-bold mb-1.5">
+                        <span class="text-slate-400">Monthly Limit</span>
+                        <span class="text-purple-600" id="wants-rem">$0</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div id="wants-bar" class="bg-purple-600 h-full transition-all duration-700" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="space-y-3" id="list-wants">
+                    <button class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-purple-400 hover:text-purple-600 transition-all bg-white/50">
+                        <Plus size={14} class="inline mr-1" /> Add Want
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="absolute -top-2 -right-2 p-6 opacity-5 text-emerald-600"><TrendingUp size={80} /></div>
+                    <h2 class="text-xl font-black text-slate-900 mb-1">Savings</h2>
+                    <p id="inv-percent" class="text-[10px] font-bold text-emerald-600 uppercase mb-3">20% Allocation</p>
+                    <div class="flex justify-between text-xs font-bold mb-1.5">
+                        <span class="text-slate-400">Monthly Limit</span>
+                        <span class="text-emerald-600" id="inv-rem">$0</span>
+                    </div>
+                    <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div id="inv-bar" class="bg-emerald-500 h-full transition-all duration-700" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="space-y-3" id="list-inv">
+                    <button class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-emerald-400 hover:text-emerald-600 transition-all bg-white/50">
+                        <Plus size={14} class="inline mr-1" /> Add Investment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
 </Layout>
+
+<script>
+    import { sync_app, app_data, init_data } from "../utils/financial-data";
+
+    function setupBudgetPage() {
+        // 1. Initialize data from LocalStorage
+        init_data();
+
+        const incomeInput = document.getElementById("strategy-income") as HTMLInputElement;
+        const strategySelect = document.getElementById("strategy-select") as HTMLSelectElement;
+
+        // Map for strategies
+        const strategies = {
+            "503020": { needs: 50, wants: 30, inv: 20 },
+            "702010": { needs: 70, wants: 20, inv: 10 },
+            "602020": { needs: 60, wants: 20, inv: 20 }
+        };
+
+        function refreshUI() {
+            const income = app_data.budget.net_income || 0;
+            const selected = strategySelect.value;
+            const config = strategies[selected as keyof typeof strategies];
+
+            // Update Labels
+            document.getElementById("needs-percent")!.innerText = `${config.needs}% Allocation`;
+            document.getElementById("wants-percent")!.innerText = `${config.wants}% Allocation`;
+            document.getElementById("inv-percent")!.innerText = `${config.inv}% Allocation`;
+
+            // Update Dollar Amounts
+            const needsVal = (income * (config.needs / 100));
+            const wantsVal = (income * (config.wants / 100));
+            const invVal = (income * (config.inv / 100));
+
+            document.getElementById("needs-rem")!.innerText = `$${Math.round(needsVal).toLocaleString()}`;
+            document.getElementById("wants-rem")!.innerText = `$${Math.round(wantsVal).toLocaleString()}`;
+            document.getElementById("inv-rem")!.innerText = `$${Math.round(invVal).toLocaleString()}`;
+
+            // Update Bars (Using the percentage for width)
+            document.getElementById("needs-bar")!.style.width = `${config.needs}%`;
+            document.getElementById("wants-bar")!.style.width = `${config.wants}%`;
+            document.getElementById("inv-bar")!.style.width = `${config.inv}%`;
+        }
+
+        // Set initial values from memory
+        if (incomeInput) incomeInput.value = app_data.budget.net_income.toString() || "";
+        if (strategySelect) strategySelect.value = app_data.budget.selected_budget || "503020";
+
+        // Listen for changes
+        incomeInput?.addEventListener("input", (e) => {
+            const val = parseFloat((e.target as HTMLInputElement).value) || 0;
+            sync_app("budget.net_income", val);
+            refreshUI();
+        });
+
+        strategySelect?.addEventListener("change", (e) => {
+            const val = (e.target as HTMLSelectElement).value;
+            sync_app("budget.selected_budget", val);
+            refreshUI();
+        });
+
+        // First run
+        refreshUI();
+    }
+
+    // Run on load and on page navigation
+    setupBudgetPage();
+    document.addEventListener("astro:page-load", setupBudgetPage);
+</script>
