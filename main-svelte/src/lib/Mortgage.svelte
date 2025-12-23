@@ -1,39 +1,48 @@
 <script lang="ts">
   import { appData } from '../utils/store';
-  import { Home, Landmark, ArrowRight } from "@lucide/svelte";
+  import { Home, Landmark, ArrowRight, ShieldAlert, Info } from "@lucide/svelte";
+  import { slide } from 'svelte/transition';
 
-  // 1. Local variables bound to inputs
-  // We initialize them from the store so your data persists
-  let price = $appData.mortgage.price;
-  let down = $appData.mortgage.down;
-  let rate = $appData.mortgage.rate;
+  // 1. State Variables
+  let price = $appData.mortgage.price || 450000;
+  let down = $appData.mortgage.down || 90000;
+  let rate = $appData.mortgage.rate || 6.5;
   let term = $appData.mortgage.term || 30;
   let taxRate = $appData.mortgage.tax_rate || 1.2;
   let insurance = $appData.mortgage.insurance || 150;
+  let hoa = 0;
 
-  // 2. Reactive Math (The $: means "run this whenever any variable inside it changes")
+  // 2. Realistic Reactive Math
   $: principal = price - down;
+  $: downPercent = (down / price) * 100;
   $: monthlyRate = (rate / 100) / 12;
   $: n = term * 12;
   
+  // Principal & Interest
   $: pi = (principal > 0 && monthlyRate > 0) 
      ? (principal * monthlyRate * Math.pow(1 + monthlyRate, n)) / (Math.pow(1 + monthlyRate, n) - 1)
      : (principal > 0 ? principal / n : 0);
 
+  // Taxes & Insurance
   $: monthlyTax = (price * (taxRate / 100)) / 12;
-  $: total = pi + monthlyTax + insurance;
+  
+  // PMI Logic: Only applies if down payment < 20%
+  // Average PMI is roughly 0.58% of the loan amount annually
+  $: pmi = (downPercent < 20 && principal > 0) 
+     ? (principal * 0.0058) / 12 
+     : 0;
 
-  // 3. Actions
+  // Maintenance reserve (Standard rule of thumb: 1% of home value per year)
+  $: maintenance = (price * 0.01) / 12;
+
+  $: total = pi + monthlyTax + insurance + pmi + hoa;
+
   function pushToBudget() {
     $appData.budget.needs = [
       ...$appData.budget.needs.filter(item => item.name !== "Mortgage"),
       { name: "Mortgage", amount: Math.round(total) }
     ];
-    
-    // Also save the current mortgage inputs for next time
-    $appData.mortgage = { price, down, rate, term, tax_rate: taxRate, insurance, monthly_total: Math.round(total) };
-    
-    alert("Mortgage added to Budget Needs!");
+    alert("Mortgage estimate pushed to budget!");
   }
 </script>
 
@@ -45,11 +54,14 @@
       </div>
       <div>
         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Mortgage Calc</h1>
-        <p class="text-slate-500 font-medium">Full Monthly PITI Estimate</p>
+        <p class="text-slate-500 font-medium italic text-sm">
+            <ShieldAlert size={14} class="inline mr-1" /> 
+            Estimate only. Actual bank terms will vary.
+        </p>
       </div>
     </div>
     <div class="text-center md:text-right">
-      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Monthly Payment</p>
+      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Monthly Payment (PITI + HOA)</p>
       <p class="text-4xl font-black text-rose-600">${Math.round(total).toLocaleString()}</p>
     </div>
   </header>
@@ -58,44 +70,28 @@
     <section class="space-y-6">
       <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
         <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-          <Landmark class="text-rose-500" size={20} /> Loan & Escrow
+          <Landmark class="text-rose-500" size={20} /> Property & Loan
         </h2>
         
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Home Price</label>
-              <input type="number" placeholder="450000" bind:value={price} class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold text-lg border-2 border-transparent focus:border-rose-500 focus:bg-white transition-all" />
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Home Price</label>
+                <input type="number" bind:value={price} class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-2 border-transparent focus:border-rose-500 outline-none transition-all" />
             </div>
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Down Payment</label>
-              <input type="number" bind:value={down} placeholder="90000" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold text-lg border-2 border-transparent focus:border-rose-500 focus:bg-white transition-all" />
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Down Payment ({downPercent.toFixed(1)}%)</label>
+                <input type="number" bind:value={down} class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-2 border-transparent focus:border-rose-500 outline-none transition-all" />
             </div>
-          </div>
+        </div>
 
-          <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Interest Rate (%)</label>
-              <input type="number" step="0.1" placeholder="6.5" bind:value={rate} class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold text-lg border-2 border-transparent focus:border-rose-500 focus:bg-white transition-all" />
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">Interest Rate (%)</label>
+                <input type="number" step="0.1" bind:value={rate} class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-2 border-transparent focus:border-rose-500 outline-none transition-all" />
             </div>
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Loan Term</label>
-              <select bind:value={term} class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold text-slate-700">
-                <option value={30}>30 Years</option>
-                <option value={15}>15 Years</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Property Tax (Annual %)</label>
-                <input type="number" step="0.1" bind:value={taxRate} class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-rose-500 focus:bg-white transition-all" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Monthly Insurance</label>
-                <input type="number" bind:value={insurance} class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-rose-500 focus:bg-white transition-all" />
-              </div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">HOA / Month</label>
+                <input type="number" bind:value={hoa} placeholder="0" class="w-full bg-slate-50 p-4 rounded-2xl font-bold border-2 border-transparent focus:border-rose-500 outline-none transition-all" />
             </div>
         </div>
       </div>
@@ -107,7 +103,8 @@
 
     <section class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
       <h2 class="text-xl font-bold text-slate-800 mb-6">Payment Breakdown</h2>
-      <div class="space-y-4">
+      
+      <div class="space-y-3">
           <div class="flex justify-between p-4 bg-slate-50 rounded-2xl">
               <span class="text-slate-500 font-bold">Principal & Interest</span>
               <span class="font-black text-slate-900">${Math.round(pi).toLocaleString()}</span>
@@ -116,15 +113,32 @@
               <span class="text-slate-500 font-bold">Property Taxes</span>
               <span class="font-black text-slate-900">${Math.round(monthlyTax).toLocaleString()}</span>
           </div>
+          {#if pmi > 0}
+            <div class="flex justify-between p-4 bg-rose-50 rounded-2xl border border-rose-100" transition:slide>
+                <span class="text-rose-600 font-bold flex items-center gap-1">
+                    PMI <Info size={12}/>
+                </span>
+                <span class="font-black text-rose-700">${Math.round(pmi).toLocaleString()}</span>
+            </div>
+          {/if}
           <div class="flex justify-between p-4 bg-slate-50 rounded-2xl">
-              <span class="text-slate-500 font-bold">Home Insurance</span>
-              <span class="font-black text-slate-900">${Math.round(insurance).toLocaleString()}</span>
+              <span class="text-slate-500 font-bold">Insurance & HOA</span>
+              <span class="font-black text-slate-900">${Math.round(insurance + hoa).toLocaleString()}</span>
           </div>
       </div>
-      
-      <div class="mt-8 p-6 bg-rose-50 rounded-3xl border border-rose-100">
-          <p class="text-xs font-black text-rose-400 uppercase tracking-widest mb-2">Pro Tip</p>
-          <p class="text-rose-900 text-sm font-medium leading-relaxed">This calculation includes <b>PITI</b>. Most banks require this total to be less than 28% of your gross income.</p>
+
+      <div class="mt-8 p-6 bg-slate-900 rounded-3xl text-white">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Hidden Monthly Cost</span>
+            <span class="text-xs text-slate-400 italic">Not in PITI</span>
+          </div>
+          <div class="flex justify-between items-center">
+              <span class="font-bold">Maintenance Fund (1%)</span>
+              <span class="font-black text-rose-400">${Math.round(maintenance).toLocaleString()}</span>
+          </div>
+          <p class="text-[10px] text-slate-500 mt-4 leading-tight">
+            Note: Banks don't collect maintenance funds, but your budget should. Total "True Cost" of ownership: <b>${Math.round(total + maintenance).toLocaleString()}/mo</b>.
+          </p>
       </div>
     </section>
   </div>

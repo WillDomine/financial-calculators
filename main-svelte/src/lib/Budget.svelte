@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { appData } from '../utils/store.ts';
-    import { Plus, Zap, Heart, TrendingUp, Landmark, Trash2, X, RefreshCcw } from '@lucide/svelte';
+    import { appData } from '../utils/store';
+    import { Plus, Zap, Heart, TrendingUp, Landmark, Trash2, Wallet, AlertCircle } from '@lucide/svelte';
     import AddItemOverlay from './components/AddItemOverlay.svelte';
 
     // 1. Strategies Definition
@@ -30,7 +30,9 @@
         inv: $appData.budget.investments.reduce((sum:number, item:any) => sum + item.amount, 0)
     };
 
-    $: getPercent = (spent:number, limit:number) => (limit > 0 ? Math.min((spent / limit) * 100, 100) : 0);
+    // The "Bottom Line" Logic
+    $: totalSpent = totals.needs + totals.wants + totals.inv;
+    $: remaining = income - totalSpent;
 
     // 4. Functions
     function openModal(category: 'needs' | 'wants' | 'investments') {
@@ -38,7 +40,6 @@
         showModal = true;
     }
 
-    // THIS IS THE FIX: Handle the data from the event detail
     function handleAddItem(event: any) {
         const { name, amount } = event.detail;
         if (name && amount) {
@@ -64,56 +65,71 @@
 
 <main class="md:ml-24 p-4 lg:p-8 max-w-[1600px] mx-auto pb-32">
     
-    <section class="bg-white/80 backdrop-blur-md rounded-[2rem] p-5 mb-6 border border-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="p-2.5 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200">
-                <Landmark size={20} />
-            </div>
-            <div>
-                <h1 class="text-xl font-black text-slate-900 tracking-tight">Budget Hub</h1>
-                <p class="flex items-center gap-1 text-[9px] font-bold text-emerald-400 uppercase tracking-widest transition-colors">
-                    Real Time
-                </p>
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between col-span-1 md:col-span-1">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-blue-600 text-white rounded-xl">
+                    <Landmark size={20} />
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-slate-900">Budget Hub</h1>
+                    <select bind:value={$appData.budget.selected_strategy} class="text-[10px] font-bold text-slate-400 uppercase outline-none bg-transparent cursor-pointer">
+                        <option value="503020">50/30/20 Plan</option>
+                        <option value="702010">70/20/10 Plan</option>
+                        <option value="602020">60/20/20 Plan</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-row items-center gap-3 w-full sm:w-auto">
-            <div class="bg-white border border-slate-100 p-2.5 rounded-xl shadow-sm flex-1 sm:min-w-[180px]">
-                <label class="block text-[9px] font-black text-slate-400 uppercase mb-0.5">Net Monthly Income</label>
-                <div class="flex font-bold">
-                    <span class="text-slate-400 pr-0.5">$</span>
-                    <input type="number" bind:value={$appData.income.net_monthly} placeholder="0" class="bg-transparent font-bold outline-none w-full text-slate-900" />
-                </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Net Income</p>
+                <p class="text-2xl font-black text-slate-900">${income.toLocaleString()}</p>
             </div>
-            <div class="bg-white border border-slate-100 p-2.5 rounded-xl shadow-sm flex-1 sm:min-w-[180px]">
-                <label class="block text-[9px] font-black text-slate-400 uppercase mb-0.5">Budget Strategy</label>
-                <select bind:value={$appData.budget.selected_strategy} class="bg-transparent font-bold outline-none w-full text-slate-700 text-sm cursor-pointer">
-                    <option value="503020">50/30/20 (Standard)</option>
-                    <option value="702010">70/20/10 (Aggressive)</option>
-                    <option value="602020">60/20/20 (Balanced)</option>
-                </select>
+            <Wallet class="text-slate-300" size={24} />
+        </div>
+
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Expenses</p>
+                <p class="text-2xl font-black text-slate-900">${totalSpent.toLocaleString()}</p>
             </div>
+            <Zap class="text-slate-300" size={24} />
+        </div>
+
+        <div class="p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between {remaining >= 0 ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-rose-500 text-white shadow-rose-100'} transition-all">
+            <div>
+                <p class="text-[10px] font-black opacity-80 uppercase tracking-widest">Remaining</p>
+                <p class="text-2xl font-black">${Math.round(remaining).toLocaleString()}</p>
+            </div>
+            {#if remaining < 0}
+                <AlertCircle size={28} />
+            {:else}
+                <TrendingUp size={28} />
+            {/if}
         </div>
     </section>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         <div class="flex flex-col gap-4">
             <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
-                <div class="absolute -top-2 -right-2 p-6 opacity-5 text-blue-600"><Zap size={80} /></div>
                 <h2 class="text-xl font-black text-slate-900 mb-1">Needs</h2>
-                <p class="text-[10px] font-bold text-blue-600 uppercase mb-3">{currentStrat.needs * 100}% Allocation</p>
-                <div class="flex justify-between text-xs font-bold mb-1.5">
-                    <span class="text-slate-400">Used: ${Math.round(totals.needs)}</span>
-                    <span class="text-blue-600">Limit: ${Math.round(limits.needs)}</span>
+                <p class="text-[10px] font-bold text-blue-600 uppercase mb-4">{currentStrat.needs * 100}% Target</p>
+                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">
+                    <div class="h-full transition-all duration-700 {totals.needs > limits.needs ? 'bg-rose-500' : 'bg-blue-600'}" 
+                         style="width: {Math.min((totals.needs / (limits.needs || 1)) * 100, 100)}%"></div>
                 </div>
-                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="bg-blue-600 h-full transition-all duration-700" style="width: {getPercent(totals.needs, limits.needs)}%"></div>
+                <div class="flex justify-between text-xs font-black">
+                    <span class={totals.needs > limits.needs ? 'text-rose-500' : 'text-slate-500'}>${Math.round(totals.needs).toLocaleString()}</span>
+                    <span class="text-slate-300">limit ${Math.round(limits.needs).toLocaleString()}</span>
                 </div>
             </div>
 
             <div class="space-y-3">
                 {#each $appData.budget.needs as item, i}
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-blue-200 transition-all">
                         <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.name}</p>
                             <p class="font-bold text-slate-900">${item.amount.toLocaleString()}</p>
@@ -131,21 +147,21 @@
 
         <div class="flex flex-col gap-4">
             <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
-                <div class="absolute -top-2 -right-2 p-6 opacity-5 text-purple-600"><Heart size={80} /></div>
                 <h2 class="text-xl font-black text-slate-900 mb-1">Wants</h2>
-                <p class="text-[10px] font-bold text-purple-600 uppercase mb-3">{currentStrat.wants * 100}% Allocation</p>
-                <div class="flex justify-between text-xs font-bold mb-1.5">
-                    <span class="text-slate-400">Used: ${Math.round(totals.wants)}</span>
-                    <span class="text-purple-600">Limit: ${Math.round(limits.wants)}</span>
+                <p class="text-[10px] font-bold text-purple-600 uppercase mb-4">{currentStrat.wants * 100}% Target</p>
+                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">
+                    <div class="h-full transition-all duration-700 {totals.wants > limits.wants ? 'bg-rose-500' : 'bg-purple-600'}" 
+                         style="width: {Math.min((totals.wants / (limits.wants || 1)) * 100, 100)}%"></div>
                 </div>
-                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="bg-purple-600 h-full transition-all duration-700" style="width: {getPercent(totals.wants, limits.wants)}%"></div>
+                <div class="flex justify-between text-xs font-black">
+                    <span class={totals.wants > limits.wants ? 'text-rose-500' : 'text-slate-500'}>${Math.round(totals.wants).toLocaleString()}</span>
+                    <span class="text-slate-300">limit ${Math.round(limits.wants).toLocaleString()}</span>
                 </div>
             </div>
-            
+
             <div class="space-y-3">
                 {#each $appData.budget.wants as item, i}
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-purple-200 transition-all">
                         <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.name}</p>
                             <p class="font-bold text-slate-900">${item.amount.toLocaleString()}</p>
@@ -163,21 +179,21 @@
 
         <div class="flex flex-col gap-4">
             <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
-                <div class="absolute -top-2 -right-2 p-6 opacity-5 text-emerald-600"><TrendingUp size={80} /></div>
                 <h2 class="text-xl font-black text-slate-900 mb-1">Savings</h2>
-                <p class="text-[10px] font-bold text-emerald-600 uppercase mb-3">{currentStrat.inv * 100}% Allocation</p>
-                <div class="flex justify-between text-xs font-bold mb-1.5">
-                    <span class="text-slate-400">Used: ${Math.round(totals.inv)}</span>
-                    <span class="text-emerald-600">Limit: ${Math.round(limits.inv)}</span>
+                <p class="text-[10px] font-bold text-emerald-600 uppercase mb-4">{currentStrat.inv * 100}% Target</p>
+                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">
+                    <div class="h-full transition-all duration-700 {totals.inv > limits.inv ? 'bg-rose-500' : 'bg-emerald-500'}" 
+                         style="width: {Math.min((totals.inv / (limits.inv || 1)) * 100, 100)}%"></div>
                 </div>
-                <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div class="bg-emerald-500 h-full transition-all duration-700" style="width: {getPercent(totals.inv, limits.inv)}%"></div>
+                <div class="flex justify-between text-xs font-black">
+                    <span class={totals.inv > limits.inv ? 'text-rose-500' : 'text-slate-500'}>${Math.round(totals.inv).toLocaleString()}</span>
+                    <span class="text-slate-300">limit ${Math.round(limits.inv).toLocaleString()}</span>
                 </div>
             </div>
-            
+
             <div class="space-y-3">
                 {#each $appData.budget.investments as item, i}
-                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center group hover:border-emerald-200 transition-all">
                         <div>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.name}</p>
                             <p class="font-bold text-slate-900">${item.amount.toLocaleString()}</p>
@@ -188,7 +204,7 @@
                     </div>
                 {/each}
                 <button on:click={() => openModal('investments')} class="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold text-xs hover:border-emerald-400 hover:text-emerald-600 transition-all bg-white/50">
-                    <Plus size={14} class="inline mr-1" /> Add Investment
+                    <Plus size={14} class="inline mr-1" /> Add Savings
                 </button>
             </div>
         </div>

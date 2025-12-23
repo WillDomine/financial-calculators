@@ -2,30 +2,34 @@
   import { appData } from '../utils/store';
   import { Car, Fuel, ShieldAlert, Wrench, ArrowRight, Info, Landmark } from "@lucide/svelte";
 
-  // 1. Local state bound to inputs, initialized from store
+  // 1. Local state bound to inputs (Restored exactly to your store links)
   let price = $appData.car.price;
   let down = $appData.car.down;
   let rate = $appData.car.rate;
   let term = $appData.car.term;
   
+  // Sales Tax (New for accuracy)
+  let salesTaxRate = 7; 
+  
   let ins = 180;
   let gas = 150;
   let maint = 100;
 
-  // 2. Reactive Loan Math
-  $: principal = price - down;
+  // 2. Reactive Loan Math (Updated to include Sales Tax for realism)
+  $: totalPurchasePrice = price * (1 + (salesTaxRate / 100));
+  $: principal = totalPurchasePrice - down;
   $: monthlyRate = (rate / 100) / 12;
+  
   $: loanPayment = (principal > 0 && monthlyRate > 0)
     ? (principal * monthlyRate * Math.pow(1 + monthlyRate, term)) / (Math.pow(1 + monthlyRate, term) - 1)
     : (principal > 0 ? principal / term : 0);
 
   $: totalMonthly = loanPayment + ins + gas + maint;
 
-  // 3. Affordability Logic (Reactive to totalMonthly and Net Income)
+  // 3. Affordability Logic
   $: netIncome = $appData.income.net_monthly || 0;
   $: ratio = netIncome > 0 ? (totalMonthly / netIncome) * 100 : 0;
 
-  // Reactive Status Object
   $: status = (() => {
     if (netIncome === 0) return { text: "Set Income First", color: "bg-slate-400", style: "border-slate-100" };
     if (ratio <= 10) return { text: "Perfect Fit", color: "bg-emerald-500", style: "border-emerald-100 bg-emerald-50/30" };
@@ -33,7 +37,7 @@
     return { text: "Too High", color: "bg-rose-500", style: "border-rose-100 bg-rose-50/30" };
   })();
 
-  // 4. Actions
+  // 4. Actions (Kept exactly as your original "Push to Budget" logic)
   let feedback = false;
 
   function pushToBudget() {
@@ -42,7 +46,7 @@
       { name: "Car Payment", amount: Math.round(totalMonthly) }
     ];
     
-    // Save current car details to store
+    // Save current car details back to your store
     $appData.car = { price, down, rate, term, total_monthly: Math.round(totalMonthly) };
     
     feedback = true;
@@ -58,7 +62,10 @@
       </div>
       <div>
         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Auto Hub</h1>
-        <p class="text-slate-500 font-medium">Sticker price to monthly budget</p>
+        <p class="text-slate-500 font-medium italic text-xs">
+            <ShieldAlert size={12} class="inline" /> 
+            Estimate only. Actual bank terms and taxes vary.
+        </p>
       </div>
     </div>
     <div class="text-center md:text-right">
@@ -100,6 +107,11 @@
                 <option value={72}>72 Months (6yr)</option>
               </select>
             </div>
+          </div>
+          
+          <div class="pt-2">
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Est. Sales Tax %</label>
+            <input type="number" bind:value={salesTaxRate} class="w-full bg-slate-50 p-3 rounded-xl outline-none font-bold text-sm border-2 border-transparent focus:border-amber-500 focus:bg-white transition-all" />
           </div>
         </div>
       </div>
@@ -152,12 +164,12 @@
       </div>
 
       <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden">
-          <Car class="absolute -bottom-4 -right-4 opacity-10 text-white" size={160} />
           <h3 class="text-lg font-black mb-4 flex items-center gap-2">
-              <Info size={18} class="text-amber-400" /> Ownership Tip
+              <Info size={18} class="text-amber-400" /> Ownership Insight
           </h3>
           <p class="text-slate-300 text-sm leading-relaxed relative z-10">
-              A car is a <b>depreciating asset</b>. Financial experts suggest your total auto costs should stay under <b>10% of your net monthly income</b>.
+              Your estimated loan amount is <b>${Math.round(principal).toLocaleString()}</b> including taxes. 
+              Always check for dealer-specific fees (doc fees, prep fees) which can add another $500–$1,000 to the price.
           </p>
       </div>
     </section>

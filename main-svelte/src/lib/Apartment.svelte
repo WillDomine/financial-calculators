@@ -1,15 +1,19 @@
-<script>
-  import { appData } from '../utils/store.ts';
-  import { Building2, Users, ArrowRight, Droplets, ShieldCheck } from '@lucide/svelte';
+<script lang="ts">
+  import { appData } from '../utils/store';
+  import { Building2, Users, ArrowRight, ShieldCheck, Info, Dog } from '@lucide/svelte';
 
-  // 1. Bind to store (starting as null or 0)
-  let rent = $appData.apartment.rent; // null
-  let utils = $appData.apartment.utilities; // null
-  let insurance = $appData.apartment.insurance; // null
+  // 1. Bind to store (Restored exactly to your app links)
+  let rent = $appData.apartment.rent || 2000; 
+  let utils = $appData.apartment.utilities || 100; 
+  let insurance = $appData.apartment.insurance || 30; 
   let roommates = $appData.apartment.roommates || 1;
+  
+  // New variables for realism
+  let otherFees = 0; // Pet rent, valet trash, etc.
 
   // 2. Reactive Calculations
-  $: totalBuilding = (rent || 0) + (utils || 0);
+  $: totalBuilding = (rent || 0) + (utils || 0) + (otherFees || 0);
+  // Shared costs are divided; insurance is personal and added after the split
   $: yourShare = (totalBuilding / roommates) + (insurance || 0);
 
   $: netIncome = $appData.income.net_monthly || 0;
@@ -32,7 +36,7 @@
       { name: "Rent", amount: Math.round(yourShare) }
     ];
 
-    // Save inputs back to store
+    // Save inputs back to store exactly as before
     $appData.apartment = { rent, utilities: utils, insurance, roommates, your_share: Math.round(yourShare) };
 
     feedback = true;
@@ -49,7 +53,10 @@
       </div>
       <div>
         <h1 class="text-3xl font-black text-slate-900 tracking-tight">Rent Hub</h1>
-        <p class="text-slate-500 font-medium">Split bills & check affordability</p>
+        <p class="text-slate-500 font-medium italic text-xs">
+          <ShieldCheck size={12} class="inline mr-1" />
+          Estimate only. Does not include security deposits or move-in fees.
+        </p>
       </div>
     </div>
     <div class="text-center md:text-right">
@@ -74,9 +81,6 @@
                   <button on:click={() => roommates++} class="w-10 h-10 flex items-center justify-center font-bold hover:bg-white/20 rounded-lg transition-all">+</button>
               </div>
           </div>
-          <p class="text-indigo-100 text-xs mt-3 font-medium">
-            Total costs divided between {roommates} {roommates === 1 ? 'person' : 'people'}.
-          </p>
       </div>
 
       <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100">
@@ -88,19 +92,26 @@
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Total Utilities</label>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Shared Utilities</label>
               <input type="number" bind:value={utils} placeholder="200" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" />
             </div>
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Your Insurance</label>
-              <input type="number" bind:value={insurance} placeholder="20" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" />
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1 flex items-center gap-1">
+                <Dog size={10}/> Pet Rent / Fees
+              </label>
+              <input type="number" bind:value={otherFees} placeholder="50" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" />
             </div>
+          </div>
+          
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-2 ml-1">Your Personal Renter's Insurance</label>
+            <input type="number" bind:value={insurance} placeholder="20" class="w-full bg-slate-50 p-4 rounded-2xl outline-none font-bold border-2 border-transparent focus:border-indigo-500 focus:bg-white transition-all" />
           </div>
         </div>
       </div>
 
       <button on:click={pushToBudget} class="w-full {feedback ? 'bg-indigo-600' : 'bg-slate-900'} text-white p-6 rounded-[2rem] font-black text-lg transition-all flex items-center justify-center gap-3 group shadow-xl">
-        {feedback ? '✓ Added to Budget' : 'Push to Budget Needs'}
+        {feedback ? '✓ Added to Budget Hub' : 'Push to Budget Needs'}
         {#if !feedback} <ArrowRight class="group-hover:translate-x-2 transition-transform" /> {/if}
       </button>
     </section>
@@ -119,11 +130,11 @@
               
               <div class="space-y-4">
                   <div class="flex justify-between text-sm font-bold">
-                      <span class="text-slate-400">Total Building Cost</span>
+                      <span class="text-slate-400">Total Building (Rent+Utils+Fees)</span>
                       <span class="text-slate-900">${Math.round(totalBuilding).toLocaleString()}</span>
                   </div>
                   <div class="flex justify-between text-sm font-bold border-t border-slate-200 pt-4">
-                      <span class="text-slate-400">Your Share</span>
+                      <span class="text-slate-400">Your Share + Personal Ins.</span>
                       <span class="text-indigo-600">${Math.round(yourShare).toLocaleString()}</span>
                   </div>
               </div>
@@ -134,6 +145,15 @@
                   </div>
               </div>
           </div>
+      </div>
+
+      <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white">
+        <h3 class="text-lg font-black mb-4 flex items-center gap-2">
+            <Info size={18} class="text-indigo-400" /> Rental Tip
+        </h3>
+        <p class="text-slate-400 text-sm leading-relaxed">
+            Most landlords require your <b>Gross Income</b> to be 3x the monthly rent. Our calculation uses <b>Net Income</b> for a safer, more realistic budget.
+        </p>
       </div>
     </section>
   </div>
