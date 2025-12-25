@@ -22,7 +22,7 @@
   ];
 </script>
 
-<main class="md:ml-24 p-4 lg:p-8 max-w-[800px] mx-auto pb-32">
+<main class="md:ml-24 p-4 lg:p-8 max-w-200 mx-auto pb-32">
   <header class="mb-12 ml-2">
     <div class="flex items-center gap-4 mb-2">
       <div class="p-3 bg-slate-900 text-white rounded-2xl shadow-xl shadow-slate-200">

@@ -25,13 +25,13 @@
     }
 </script>
 
-<aside class="fixed left-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3 p-3 bg-white border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[2rem]">
+<aside class="fixed left-6 top-1/2 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3 p-3 bg-white border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-4xl">
     {#each navItems as item}
         {@const Icon = item.icon}
         {@const active = activePage === item.id}
         
         <a
-            href={item.name}
+            href={item.id}
             on:click={(e) => navigate(item, e)}
             class="relative group p-4 rounded-2xl transition-all duration-500 {active 
                 ? `text-slate-50 ${item.color} shadow-inner` 
@@ -48,14 +48,14 @@
     {/each}
 </aside>
 
-<nav class="fixed bottom-6 left-6 right-6 z-50 md:hidden bg-white/90 backdrop-blur-xl border border-white rounded-[2rem] p-2 shadow-2xl">
+<nav class="fixed bottom-6 left-4 right-4 z-50 md:hidden bg-white/90 backdrop-blur-xl border border-white rounded-4xl p-2 shadow-2xl">
     <div class="flex justify-around items-center">
         {#each navItems as item}
             {@const Icon = item.icon}
             {@const active = activePage === item.id}
             
             <a 
-                href={item.href} 
+                href={item.id} 
                 on:click={(e) => navigate(item, e)}
                 class="p-3 rounded-2xl transition-colors {active ? `${item.color} text-white` : "text-slate-400"}"
             >

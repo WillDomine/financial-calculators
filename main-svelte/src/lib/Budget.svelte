@@ -63,10 +63,10 @@
     on:add={handleAddItem} 
 />
 
-<main class="md:ml-24 p-4 lg:p-8 max-w-[1600px] mx-auto pb-32">
+<main class="md:ml-24 p-4 lg:p-8 max-w-400 mx-auto pb-32">
     
     <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between col-span-1 md:col-span-1">
+        <div class="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm flex items-center justify-between col-span-1 md:col-span-1">
             <div class="flex items-center gap-3">
                 <div class="p-2.5 bg-blue-600 text-white rounded-xl">
                     <Landmark size={20} />
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div class="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Net Income</p>
                 <p class="text-2xl font-black text-slate-900">${income.toLocaleString()}</p>
@@ -90,7 +90,7 @@
             <Wallet class="text-slate-300" size={24} />
         </div>
 
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between">
+        <div class="bg-white p-6 rounded-4xl border border-slate-100 shadow-sm flex items-center justify-between">
             <div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Expenses</p>
                 <p class="text-2xl font-black text-slate-900">${totalSpent.toLocaleString()}</p>
@@ -98,7 +98,7 @@
             <Zap class="text-slate-300" size={24} />
         </div>
 
-        <div class="p-6 rounded-[2rem] border border-slate-100 shadow-sm flex items-center justify-between {remaining >= 0 ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-rose-500 text-white shadow-rose-100'} transition-all">
+        <div class="p-6 rounded-4xl border border-slate-100 shadow-sm flex items-center justify-between {remaining >= 0 ? 'bg-emerald-500 text-white shadow-emerald-100' : 'bg-rose-500 text-white shadow-rose-100'} transition-all">
             <div>
                 <p class="text-[10px] font-black opacity-80 uppercase tracking-widest">Remaining</p>
                 <p class="text-2xl font-black">${Math.round(remaining).toLocaleString()}</p>
@@ -114,7 +114,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <div class="flex flex-col gap-4">
-            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+            <div class="bg-white rounded-4xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
                 <h2 class="text-xl font-black text-slate-900 mb-1">Needs</h2>
                 <p class="text-[10px] font-bold text-blue-600 uppercase mb-4">{currentStrat.needs * 100}% Target</p>
                 <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">
@@ -146,7 +146,7 @@
         </div>
 
         <div class="flex flex-col gap-4">
-            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+            <div class="bg-white rounded-4xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
                 <h2 class="text-xl font-black text-slate-900 mb-1">Wants</h2>
                 <p class="text-[10px] font-bold text-purple-600 uppercase mb-4">{currentStrat.wants * 100}% Target</p>
                 <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">
@@ -178,7 +178,7 @@
         </div>
 
         <div class="flex flex-col gap-4">
-            <div class="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+            <div class="bg-white rounded-4xl p-6 shadow-sm border border-slate-100 relative overflow-hidden">
                 <h2 class="text-xl font-black text-slate-900 mb-1">Savings</h2>
                 <p class="text-[10px] font-bold text-emerald-600 uppercase mb-4">{currentStrat.inv * 100}% Target</p>
                 <div class="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden mb-2">

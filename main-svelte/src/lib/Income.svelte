@@ -59,7 +59,7 @@
   }
 </script>
 
-<main class="md:ml-24 p-4 lg:p-8 max-w-[1200px] mx-auto pb-32">
+<main class="md:ml-24 p-4 lg:p-8 max-w-300 mx-auto pb-32">
   
   <header class="bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 mb-8 border border-white shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
     <div class="flex items-center gap-4 text-emerald-600">
@@ -148,7 +148,7 @@
 
       <button 
         on:click={pushToBudget}
-        class="w-full {feedback ? 'bg-emerald-600' : 'bg-slate-900'} text-white p-6 rounded-[2rem] font-black text-lg transition-all flex items-center justify-center gap-3 group shadow-xl"
+        class="w-full {feedback ? 'bg-emerald-600' : 'bg-slate-900'} text-white p-6 rounded-4xl font-black text-lg transition-all flex items-center justify-center gap-3 group shadow-xl"
       >
         {feedback ? '✓ Pushed to Budget!' : 'Push to Budget Hub'}
         {#if !feedback}

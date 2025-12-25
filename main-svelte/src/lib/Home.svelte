@@ -62,7 +62,7 @@
           class="group relative text-left overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white p-8 transition-all hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-1 w-full md:w-[calc(50%-1.5rem)] lg:w-[calc(33.33%-1.5rem)] min-w-[320px]"
         >
           <div class="flex items-start justify-between">
-            <div class={`p-4 rounded-2xl ${calc.color} text-white shadow-lg shadow-inner`}>
+            <div class={`p-4 rounded-2xl ${calc.color} text-white shadow-inner`}>
               <svelte:component this={calc.icon} size={28} />
             </div>
             <div class="text-slate-200 group-hover:text-slate-400 transition-colors">
